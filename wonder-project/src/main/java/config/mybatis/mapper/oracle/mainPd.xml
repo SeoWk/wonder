@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ez.wonder.main.model.MainPdDAO">
+
+	<select id="mainPdList" resultType="MainPdVo">
+		
+	
+		select p.pd_no,p.user_id,p.pd_title,p.lang,p.frame,p.regdate,
+		i.file_name,i.original_file_name,i.file_type,
+		d.pd_type,d.pd_price,d.pd_term,d.edit_count,d.service_explanation,d.edit_explanation
+		from product p join pd_image i
+		on p.pd_no = i.pd_no
+		join pd_detail d 
+		on i.pd_no=d.pd_no
+		where d.pd_type='STANDARD' and 
+		<![CDATA[
+		rownum<=8]]>
+		order by regdate desc
+		
+		
+	</select>
+</mapper>

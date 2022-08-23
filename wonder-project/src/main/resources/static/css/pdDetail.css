@@ -1,0 +1,218 @@
+@charset "UTF-8";
+
+	#profile {
+		height: 32rem;
+	}
+	
+  /* use display:inline-flex to prevent whitespace issues. alternatively, you can put all the children of .rating-group on a single line */
+  .rating-group {
+    display: inline-flex;
+  }
+  
+  /* make hover effect work properly in IE */
+  .rating__icon {
+    pointer-events: none;
+  }
+  
+  /* hide radio inputs */
+  .rating__input {
+   position: absolute !important;
+   left: -9999px !important;
+  }
+
+  /* set icon padding and size */
+  .rating__label {
+    cursor: pointer;
+    /* if you change the left/right padding, update the margin-right property of .rating__label--half as well. */
+    padding: 0 0.1em;
+    font-size: 2rem;
+  }
+
+  /* add padding and positioning to half star labels */
+  .rating__label--half {
+    padding-right: 0;
+    margin-right: -0.5em;
+    z-index: 2;
+  }
+  
+  /* set default star color */
+  .rating__icon--star {
+    color: orange;
+  }
+  
+  /* set color of none icon when unchecked */
+  .rating__icon--none {
+    color: #eee;
+  }
+
+  /* if none icon is checked, make it red */
+  .rating__input--none:checked + .rating__label .rating__icon--none {
+    color: red;
+  }
+
+  /* if any input is checked, make its following siblings grey */
+  .rating__input:checked ~ .rating__label .rating__icon--star {
+    color: #ddd;
+  }
+  
+  /* make all stars orange on rating group hover */
+  .rating-group:hover .rating__label .rating__icon--star,
+  .rating-group:hover .rating__label--half .rating__icon--star {
+    color: orange;
+  }
+
+  /* make hovered input's following siblings grey on hover */
+  .rating__input:hover ~ .rating__label .rating__icon--star,
+  .rating__input:hover ~ .rating__label--half .rating__icon--star {
+    color: #ddd;
+  }
+  
+  /* make none icon grey on rating group hover */
+  .rating-group:hover .rating__input--none:not(:hover) + .rating__label .rating__icon--none {
+     color: #eee;
+  }
+
+  /* make none icon red on hover */
+  .rating__input--none:hover + .rating__label .rating__icon--none {
+    color: red;
+  }
+
+	[type="radio"]:checked + label,
+	[type="radio"]:not(:checked) + label {
+	    padding-left: 0;
+	}
+	[type="radio"]:checked + label:before,
+	[type="radio"]:not(:checked) + label:before {
+	    content: none;
+	} 
+	[type="radio"]:checked + label:after,
+	[type="radio"]:not(:checked) + label:after {
+	    content: none;
+	}
+	
+	/* star percentage */
+	.rating {
+  display: inline-block;
+  unicode-bidi: bidi-override;
+  color: #888888;
+  font-size: 30px;
+  height: 25px;
+  width: auto;
+  margin: 0;
+  position: relative;
+  padding: 0;
+  top: -16px;
+}
+
+.rating-upper {
+  color: orange;
+  padding: 0;
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+}
+
+.rating-lower {
+  padding: 0;
+  display: flex;
+  z-index: 0;
+}
+
+.bigScore{
+	font-size: 40px;
+    font-weight: 700;
+    line-height: 33px;
+    color: #2a2f3a;
+}
+.avgScore{
+	font-size: 25px;
+    font-weight: 700;
+    line-height: 1em;
+    color: #2a2f3a;
+    margin-right: 180px;
+    margin-top: 4px;
+}
+
+/* detail - 가격정보 */
+.pricingTitle{
+	height: 3.875em !important;
+	line-height: 0.625em !important;
+	font-size: 18px;
+	font-weight: bold;
+}
+
+/* detail - 소제목 */
+#myTabContent h5{
+	margin: 15px 0 15px 5px;
+}
+#myTabContent p{
+	margin-left: 5px;
+}
+
+/* modal */
+.modalA{
+	top: -80px;
+}
+
+.modalC{
+	top: -80px;
+}
+
+/* datePicker */
+.daterangepicker td.active, .daterangepicker td.active:hover {
+    background-color: #27ae60;
+    color: white !important;
+}
+.daterangepicker td.available:hover, .daterangepicker th.available:hover {
+    background-color: #27ae60;
+    color: white;
+}
+th.next.available, .prev.available {
+    background: #2C3E50;
+}
+th.next.available:hover, th.prev.available:hover {
+    background: #2c3e50b3;
+}
+.daterangepicker .calendar-table .next span, .daterangepicker .calendar-table .prev span {
+    border-color: white !important;
+}
+
+/* 전문가 정보 */
+.dash_user_menues ul li {
+    padding: 8px 25px;
+    color: #2C3E50;
+}
+
+/* sidebar */
+.pdType{
+	font-size: 22px;
+	color: #2C3E50;
+}
+
+/* review */
+.regdate {
+    color: #cccccc;
+    font-size: 14px;
+    float: right;
+    font-family: arial;
+    font-weight: 200;
+}
+
+.reviewDel{
+	color: #cccccc;
+    font-size: 14px;
+    font-family: arial;
+    font-weight: 200;
+}
+
+.regdate a:focus{
+	color: #cccccc;
+}
+
+.reviewDel:hover{
+	color: red;
+}
+

@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ez.wonder.mypage.model.MypageDAO">
+<sql id="searchWhere">
+		<if test="searchKeyword !=null and searchKeyword !=''">
+        	and ${searchCondition} 
+        		like '%' || #{searchKeyword} || '%'
+        </if>
+</sql>
+	
+<select id="selectMemberByNo" parameterType="int" resultType="memberVo">
+	select * from member where mem_no=#{no} <!-- 멤버번호 세션값으로 받아오는걸로 바꿔야함!!!! -->
+</select>
+
+<select id="selectMemberById" parameterType="String" resultType="memberVo">
+	select * from member where user_id=#{userId}
+</select>
+
+
+<update id="updateMember" parameterType="memberVo" >
+	update member
+	set nickname=#{nickname}, email=#{email}, tel=#{tel}
+	where user_id=#{userId}
+</update>
+
+<!-- 프리랜서 아이디로 vo조회 -->
+<select id="selectExpertById" parameterType="String" resultType="expertVo">
+	select * from expert_info where user_id=#{userId}
+</select>
+<!-- 프리랜서 체크 -->
+<select id="checkFree" parameterType="String" resultType="int">
+	select count(*) from member
+	where type='프리랜서' and user_id=#{userId}
+</select>
+
+<!-- 승인요청 테이블 존재여부 count -->
+<select id="checkExpertGrantById" parameterType="String" resultType="int">
+select count(*) from expert_grant
+where user_id=#{userId}
+</select>
+
+<!-- 프리랜서 정보 insert -->
+<insert id="insertFree" parameterType="expertVo">
+	insert into expert_info(user_id,major, career, grade, bank_name, account_no, certificate, introduction, lang, frame)
+	values (#{userId},#{major}, #{career},#{grade},#{bankName},#{accountNo},#{certificate},#{introduction},#{lang},#{frame})
+</insert>
+
+<!-- 멤버 타입 승인대기로 update -->
+<update id="updateMemberToApplication" parameterType="expertVo">
+	update member
+	set type='승인대기'
+	where user_id=#{userId}
+</update>
+
+<!-- 승인요청 테이블에 데이터 insert -->
+<insert id="insertApplication" parameterType="expertVo">
+insert into expert_grant(user_id)
+values (#{userId})
+</insert>
+
+<!-- 프리랜서 정보 업데이트 -->
+<update id="updateFree" parameterType="expertVo">
+	update expert_info
+	set major=#{major}, career=#{career},grade=#{grade},bank_name=#{bankName},account_no=#{accountNo},certificate=#{certificate},introduction=#{introduction},lang=#{lang},frame=#{frame}
+	where user_id=#{userId}
+</update>
+
+<!-- 전문가 사진 업로드 -->
+<insert id="insertExpertProfile" parameterType="expertImageVo">
+	<selectKey resultType="int" keyProperty="expertImgNo" order="BEFORE">
+		select EXPERT_IMAGE_SEQ.nextval from dual
+	</selectKey>
+	insert into expert_image
+	values (#{expertImgNo},#{userId},#{fileName},#{originalFileName},#{fileSize},'PROFILE')
+</insert>
+
+<!-- 전문가 사진 기본사진으로 업로드 -->
+<insert id="insertDefaultExpertProfile" parameterType="expertImageVo">
+	<selectKey resultType="int" keyProperty="expertImgNo" order="BEFORE">
+		select EXPERT_IMAGE_SEQ.nextval from dual
+	</selectKey>
+	insert into expert_image
+	values (#{expertImgNo},#{userId},'default_profile.png','default_profile.png',18906,'PROFILE')
+</insert>
+
+<!-- 전문가 아이디로 프로필사진 vo찾기 -->
+<select id="selectExpertProfileById" parameterType="String" resultType="expertImageVo">
+	select * from expert_image
+	where user_id=#{userid} and file_type='PROFILE'
+</select>
+
+<!-- 전문가 아이디로 포트폴리오사진 vo찾기 -->
+<select id="selectExpertPortfolioById" parameterType="String" resultType="expertImageVo">
+	select * from expert_image
+	where user_id=#{userid} and file_type='PORTFOLIO'
+</select>
+
+
+<!-- 전문가 아이디로 프로필사진 count찾기 -->
+<select id="checkExpertProfileById" parameterType="String" resultType="int">
+	select count(*) from expert_image
+	where user_id=#{userid} and file_type='PROFILE'
+</select>
+
+<!-- 전문가 프로필 사진 중복삭제 -->
+<delete id="deleteDupExpertProfile" parameterType="String">
+	delete from expert_image
+	where expert_img_no=(select min(expert_img_no) from expert_image where user_id=#{userId}) 
+</delete>
+
+<!-- 전체 언어 select해서 리스트에 담기 -->
+<select id="selectAllLanguage" resultType="languageVo">
+	select * from language
+</select>
+
+<!-- 전체 프레임워크 select해서 리스트에 담기 -->
+<select id="selectAllFramework" resultType="frameworkVo">
+	select * from framework
+</select>
+
+<!-- 전문가 포트폴리오 업로드 -->
+<insert id="insertExpertPorfolio" parameterType="expertImageVo">
+	<selectKey resultType="int" keyProperty="expertImgNo" order="BEFORE">
+		select EXPERT_IMAGE_SEQ.nextval from dual
+	</selectKey>
+	insert into expert_image
+	values (#{expertImgNo},#{userId},#{fileName},#{originalFileName},#{fileSize},'PORTFOLIO')
+</insert>
+
+<!-- 기존 포트폴리오 삭제 -->
+<delete id="deletePortfolio">
+	delete from expert_image
+	where file_type='PORTFOLIO'
+</delete>
+
+<!-- 비밀번호 체크시 필요한 기존 비밀번호 조회 -->
+<select id="selectPwd" parameterType="string" resultType="string">
+	select pwd from member
+	where user_id=#{userId}
+</select>
+
+<!-- 멤버 비밀번호 변경 -->
+<update id="updatePwd" parameterType="memberVo">
+	update member
+	set pwd=#{pwd}
+	where user_id=#{userId}
+</update>
+
+<!-- 찜한 게시글 정보 select -->
+<select id="selectBookmark" parameterType="hashmap" resultType="hashmap">
+select * from 
+(
+    select rownum as RNUM, Z.*
+    from
+        (
+        select A.pd_no,A.user_id,B.pd_title , TO_CHAR(C.introduction) as introduction, D.pd_price, E.file_name
+        from (((none_dup A join product B
+        on A.pd_no=B.pd_no) join expert_info C
+        on B.user_id=C.user_id) join pd_detail D
+        on B.pd_no=D.pd_no) join pd_image E
+        on B.pd_no=E.pd_no
+        where D.pd_type='STANDARD'
+		and A.user_id=#{userId}
+		<include refid="searchWhere"></include>
+        ) Z
+    )
+	where RNUM>#{firstRecordIndex} 
+		<![CDATA[
+		and RNUM<=#{firstRecordIndex} + #{recordCountPerPage} ]]>
+
+
+
+<!-- 	
+	select A.pd_no,A.user_id,B.pd_title , TO_CHAR(C.introduction) as introduction, D.pd_price, E.file_name
+	from (((none_dup A join product B
+	on A.pd_no=B.pd_no) join expert_info C
+	on A.user_id=C.user_id) join pd_detail D
+	on B.pd_no=D.pd_no) join pd_image E
+	on B.pd_no=E.pd_no
+	where D.pd_type='STANDARD'
+	and A.user_id=#{userId}
+-->
+</select>
+
+<!-- 찜한 게시글 레코드 구하기 -->
+<select id="getTotalRecordBM" parameterType="hashmap" resultType="int">	
+	select count(*)
+	from (((none_dup A join product B
+	on A.pd_no=B.pd_no) join expert_info C
+	on A.user_id=C.user_id) join pd_detail D
+	on B.pd_no=D.pd_no) join pd_image E
+	on B.pd_no=E.pd_no
+	where D.pd_type='STANDARD'
+	and A.user_id=#{userId}
+	<include refid="searchWhere"></include>
+</select>
+
+<!-- 찜한 게시글 삭제 delete -->
+<delete id="deleteBookmark" parameterType="hashmap">
+delete from none_dup
+where user_id=#{userId} and pd_no=#{pdNo}
+</delete>
+
+<!-- 거래중인 의뢰서 목록 select 고객-->
+<select id="selectForm" parameterType="hashmap" resultType="hashmap">	
+select * from 
+(
+    select rownum as RNUM, Z.*
+    from
+        (
+		select A.pd_no,B.form_no, A.user_id as s_user_id, B.user_id as b_user_id, A.pd_title, TO_CHAR(D.introduction) as introduction,B.price, 
+		A.regdate, A.read_count, C.pd_term, B.pay_flag, E.file_name, M.name, M.tel, M.email
+		from ((((product A join form B
+		on A.pd_no=B.pd_no) join pd_detail C
+		on B.pd_no=C.pd_no and B.price=C.pd_price) join expert_info D
+		on A.user_id=D.user_id) join pd_image E
+		on A.pd_no = E.pd_no) join member M
+		on B.user_id = M.user_id
+		where B.user_id=#{userId}
+		<include refid="searchWhere"></include>
+        ) Z
+    )
+	where RNUM>#{firstRecordIndex} 
+		<![CDATA[
+		and RNUM<=#{firstRecordIndex} + #{recordCountPerPage} ]]>
+</select>
+
+
+<select id="getTotalRecordTS" parameterType="hashmap" resultType="int">	
+	select count(*)
+	from (((product A join form B
+	on A.pd_no=B.pd_no) join pd_detail C
+	on B.pd_no=C.pd_no and B.price=C.pd_price) join expert_info D
+	on A.user_id=D.user_id) join pd_image E
+	on A.pd_no = E.pd_no
+	where B.user_id=#{userId}
+	<include refid="searchWhere"></include>
+	
+</select>
+
+<!-- 거래중인 의뢰서 목록 select 고객-->
+<select id="selectFormExpert" parameterType="hashmap" resultType="hashmap">	
+select * from 
+(
+    select rownum as RNUM, Z.*
+    from
+        (
+		select A.pd_no,B.form_no, A.user_id as s_user_id, B.user_id as b_user_id, A.pd_title, TO_CHAR(D.introduction) as introduction,B.price, A.regdate, A.read_count, C.pd_term, B.pay_flag, E.file_name
+		from (((product A join form B
+		on A.pd_no=B.pd_no) join pd_detail C
+		on B.pd_no=C.pd_no and B.price=C.pd_price) join expert_info D
+		on A.user_id=D.user_id) join pd_image E
+		on A.pd_no = E.pd_no
+		where B.p_user_id=#{userId}
+		<include refid="searchWhere"></include>
+        ) Z
+    )
+	where RNUM>#{firstRecordIndex} 
+		<![CDATA[
+		and RNUM<=#{firstRecordIndex} + #{recordCountPerPage} ]]>
+</select>
+
+<select id="getTotalRecordTSExpert" parameterType="hashmap" resultType="int">	
+	select count(*)
+	from (((product A join form B
+	on A.pd_no=B.pd_no) join pd_detail C
+	on B.pd_no=C.pd_no and B.price=C.pd_price) join expert_info D
+	on A.user_id=D.user_id) join pd_image E
+	on A.pd_no = E.pd_no
+	where B.p_user_id=#{userId}
+	<include refid="searchWhere"></include>
+
+</select>
+
+<!-- 의뢰서 번호로 조회 -->
+<select id="selectFormByNo" parameterType="int" resultType="formVo">	
+	select * from form
+	where form_no=#{formNo}
+</select>
+
+<!-- 의뢰서 타입 Y로 변경(거래 승인) -->
+<update id="updateForm" parameterType="int" >
+	update form
+	set PAY_FLAG='Y'
+	where FORM_NO=#{formNo}
+</update>
+
+<!-- 의뢰서 타입 C로 변경(거래취소) -->
+<update id="updateFormCancle" parameterType="int" >
+	update form
+	set PAY_FLAG='C'
+	where FORM_NO=#{formNo}
+</update>
+
+<!-- 의뢰서 타입 D로 변경(거래 완료) -->
+<update id="updateFormDone" parameterType="int" >
+	update form
+	set PAY_FLAG='D'
+	where FORM_NO=#{formNo}
+</update>
+
+<!-- 프리랜서 작업수 0으로 변경 -->
+<update id="updateExpertWorkReset" parameterType="string" >
+	update expert_info
+	set WORK_AMOUNT = 0
+	where USER_ID=#{userId}
+</update>
+
+<!-- 프리랜서 작업수 +1 -->
+<update id="updateExpertWorkPlus" parameterType="string" >
+	update expert_info
+	set WORK_AMOUNT = WORK_AMOUNT+1
+	where USER_ID=#{userId}
+</update>
+
+</mapper>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ez.wonder.qna.model.QnaDAO">
+<sql id="searchWhere">
+		<if test="searchKeyword !=null and searchKeyword !=''">
+        	where ${searchCondition} 
+        		like '%' || #{searchKeyword} || '%'
+        </if>
+	</sql>
+
+	<insert id="insertQna" parameterType="qnaVo">
+		<selectKey resultType="int" keyProperty="qnaNo"
+			order="BEFORE">
+			select qna_seq.nextval from dual
+		</selectKey>
+		insert into qna(qna_no, cate_type, user_id, qna_title, qna_content,
+		group_no,file_name, original_file_name, file_size)
+		values(#{qnaNo}, #{cateType},#{userId}, #{qnaTitle}, #{qnaContent},
+			#{qnaNo},#{fileName}, #{originalFileName}, #{fileSize})
+	</insert>
+
+		<select id="selectAll" parameterType="searchVo" resultType="qnaVo">
+		select *
+		from
+		(
+		    select rownum as RNUM, A.*
+		    from
+		    (
+		        select B.*, (sysdate-qna_regdate)*24 as dateTerm
+		        from qna B
+		        <include refid="searchWhere"></include>
+		        order by group_no desc, sort_no
+		    )A
+		)
+		where RNUM>#{firstRecordIndex} 
+		<![CDATA[
+		and RNUM<=#{firstRecordIndex} + #{recordCountPerPage} ]]>
+	</select>
+
+
+	<select id="getTotalRecord" parameterType="searchVo" resultType="int">	
+		select count(*) from qna 
+		<include refid="searchWhere"></include>
+	</select>
+
+	<update id="updateCount" parameterType="int">
+		update qna
+		set read_count=read_count+1
+		where qna_no=#{qnaNo}
+	</update>
+	
+	<select id="selectByNo" parameterType="int" resultType="qnaVo">
+		select * from qna where qna_no=#{qnaNo}
+	</select>
+	
+	<select id="selectPwd" parameterType="int" resultType="string">
+		select pwd from qna where qna_no=#{qnaNo}	
+	</select>
+	
+	<update id="updateQna" parameterType="qnaVo">
+		update qna
+		set qna_title=#{qnaTitle}, qna_content=#{qnaContent}
+		<if test="fileName !=null and fileName != ''">
+			, file_Name=#{fileName}, file_Size=#{fileSize},
+			original_File_Name=#{originalFileName}
+		</if>
+		where qna_no=#{qnaNo}
+	</update>
+	
+	<update id="updateDownCount" parameterType="int">
+		update qna set down_count=down_count+1
+		where qna_no=#{qnaNo}
+	</update>
+	
+	<delete id="deleteQna" parameterType="int">
+		update qna
+		set del_type='Y'
+		where qna_no=#{qnaNo}
+	</delete>
+	
+	<update id="updateSortNo" parameterType="qnaVo">
+		update qna
+		set sort_no=sort_no+1
+		where group_no=#{groupNo} and sort_No> #{sortNo}
+	</update>
+	
+		<insert id="reply" parameterType="qnaVo">
+		<selectKey resultType="int" keyProperty="qnaNo" order="BEFORE">
+			select qna_seq.nextval from dual
+		</selectKey>
+		
+		insert into qna(qna_no, cate_type, user_id, qna_title, qna_content,
+		group_no, step, sort_no)
+		values(#{qnaNo}, #{cateType},#{userId}, #{qnaTitle}, #{qnaContent},
+		#{groupNo},#{step}+1,#{sortNo}+1)
+	</insert>
+	
+</mapper>

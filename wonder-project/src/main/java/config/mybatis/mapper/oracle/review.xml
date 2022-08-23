@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ez.wonder.review.model.ReviewDAO">
+	<insert id="writeReview" parameterType="reviewVo">
+		<selectKey keyProperty="reviewNo" resultType="int" order="BEFORE">
+			select review_seq.nextval from dual
+		</selectKey>
+		insert into review(review_no, user_id, pd_no, review_title, review_content, rating)
+		values(#{reviewNo}, #{userId}, #{pdNo}, #{reviewTitle}, #{reviewContent}, #{rating})
+	</insert>
+	
+	<select id="selectReviewByPdNo" parameterType="int" resultType="reviewVo">
+		select * from review where pd_no=#{pdNo}
+	</select>
+	
+	<select id="getAvgScore" parameterType="int" resultType="map">
+		select sum(rating)/count(*) as avgScore, count(*) as total from review where pd_no=#{pdNo}
+	</select>
+	
+	<select id="reviewCount" parameterType="reviewVo" resultType="int">
+		select count(*)	from review where user_id=#{userId} and pd_no=#{pdNo}
+	</select>
+	
+	<delete id="deleteReview" parameterType="int">
+		delete from review where review_no=#{reviewNo}
+	</delete>
+	
+	<!-- 오지훈 - 아이디로 전체 점수 조회 -->
+	<select id="getAvgScoreByUserId" parameterType="string" resultType="map">
+		select sum(rating)/count(*) as avgScore, count(*) as total from review 
+		where pd_no in (
+		select pd_no from product where user_id=#{userId}
+		)
+	</select>
+	
+		<!-- 오지훈 - 아이디로 전체 리뷰 조회 -->
+	<select id="selectReviewByUserId" parameterType="string" resultType="reviewVo">
+		select * from review
+		where pd_no in (
+		select pd_no from product where user_id=#{userId}
+		)
+	</select>
+	
+</mapper>

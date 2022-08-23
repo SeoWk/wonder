@@ -1,0 +1,357 @@
+@charset "UTF-8";
+.pointer{
+	cursor: pointer;
+}
+/* 프로필 */
+
+.align_c{
+	text-align: center;
+}
+
+.profile_disabled{
+	background: #cfcfcf !important; 
+}
+
+.uploadBoxWrap{
+	width: 100%;
+}
+
+.uploadBox{
+	width: 49%;
+	height: 150px;
+	border: 1px solid #e7eaf1;	
+	display: inline-block;
+	float: left;
+}
+
+.uploadBox2{
+	margin-left: 1%;
+	float: right;
+}
+
+.uploadBox_inner{
+	width: 150px;
+	height: 150px;
+	display: inline-block;
+	float: left;
+}
+
+.uploadBox_inner_p{
+	width: 100%;
+	height: 100%;
+	background: #27ae60;
+	color: white;
+	text-align: center;
+	padding-top: 50px;
+	cursor: pointer;
+}
+
+.portfolioView{
+	padding-top: 65px;
+	cursor:default; 
+	
+}
+
+.uploadBox_inner_v{ 
+	width: 100%;
+	height: 100%;
+	background: #27ae60;
+	color: white;
+	text-align: center;
+	padding-top: 50px;
+}
+
+#profileUpload, #portfolioUpload{
+	width:0px;
+	height:0px;
+}
+
+.upload-display{
+	display: inline-block;
+}
+
+.upload-thumb{
+	width:150px;
+	height:150px;
+}
+
+.uploadBox_innerRight{ /* 업로드이미지 미리보기 */
+	display: inline-block;
+	float: left;
+}
+
+.portfolioBox_outter{
+	display:inline-block;
+	float: left;
+	margin: 28px 23px;
+	width: 14%;
+	height: 200px;	
+	color:#b7b7b8;
+}
+
+.portfolioBox_innerRight{ /* 업로드이미지 미리보기 */
+	display: inline-block;
+	width: 100%;
+	height: 200px;
+	display: flex;
+	justify-content: center;
+}
+
+#profile_preview_img img{ /* 프로필사진 미리보기 */
+	border-radius: 75px;
+}
+
+.dash_user_avater img{ /* 프로필 사진 */
+	min-width: 150px;
+	min-height: 150px;
+	max-width: 150px;
+	max-height: 150px;
+}
+
+.portfolioImg{ /* 프로필사진 리스트 이미지 */
+	max-width: 100%;
+	max-height: 100%;
+}
+
+#image-holder img{ /* 포트폴리오 업로드 미리보기 */
+	min-width: 150px;
+	min-height: 150px;
+	max-width: 150px;
+	max-height: 150px;	
+}
+
+/* 포트폴리오 파일 이름 input */
+#reviewProtfolioName{ 
+	border: 1px solid #e7eaf1;
+	border-top: 0;
+}
+
+
+.checkBt{ /* 체크 선택/취소 버튼 */
+	width: 100px;
+	height: 28px;
+	color:white;
+	text-align:center;
+	border-radius:30px;
+	cursor:pointer;
+	background: #27ae60;
+	display: inline-block;
+}
+
+/* 포트폴리오 이미지 모달 */
+.portfolioModal{ 
+  position:fixed;
+  z-index:7;
+  padding:7%; 
+  width:100%; 
+  height:100%; 
+  background: rgba(0,0,0,0.8); 
+  top:0; 
+  left:0; 
+  display:none;
+}
+
+.modal_content{
+  width:400px; height:200px;
+  background:#fff; border-radius:10px;
+  position:relative; top:50%; left:50%;
+  margin-top:-100px; margin-left:-200px;
+  text-align:center;
+  box-sizing:border-box; padding:74px 0;
+  line-height:23px; cursor:pointer;
+}
+
+/*****       chatting 페이지         *****/
+/* 채팅내용 보이는 전체 박스 */
+#chatCommentBox{
+	width:70%;
+	height: 700px;
+}
+
+#chatMessageTextArea{
+	height:150px;
+}
+
+.dash-msg-content{
+	min-height: 530px;
+}
+
+#chatCommentContainer{
+	overflow-x: hidden;
+	overflow-y: scroll; 
+	max-height: 76%;
+}
+
+/* 채팅 메세지 디테일칸 */
+.dash-msg-text{
+	width: auto;	
+	max-width: 70%;
+	
+}
+
+
+.message-plunch{
+	min-height: 50px;
+	overflow: hidden;
+}
+
+.right{
+	display: inline-block;
+	float: right;
+	text-align: right;
+	margin-right: 0;
+}
+
+.left{
+	display: inline-block;
+	float: left;
+	text-align: left;
+}
+
+.refresh{
+	cursor: pointer;
+}
+
+/************** Application ************/
+.appCheckDiv{
+	height: 100px;
+}
+
+.appCheckH4{
+	display: inline-block;
+	margin-top: 20px;
+}
+.appCheck{
+	display: inline-block;
+	float:right;
+}
+
+#memList{
+	text-align: conter;
+}
+
+.application {
+    padding: 3px 15px;
+    background: rgb(174 175 76 / 24%);
+    border-radius: 50px;
+    font-size: 12px;
+    color:#c0bd55;
+    border: rgb(163 175 76 / 20%);
+    font-weight: 600;
+    margin-bottom: 3px;
+    display: inline-flex;
+}
+
+/************* Bookmark *************/
+.bookmarkImg{
+	height: 200px;
+}
+
+
+/************* Transaction *************/
+.transactionTd{
+	width: 10%;
+}
+
+.transactionTdIcon{
+	width:6%;
+}
+
+.greenLabel{
+	    height: 52px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    background: #27ae60;
+    border-radius: 0.2rem;
+    width: 215px;
+}
+
+.noneList{
+	text-align: center;
+}
+
+.center{
+	text-align: center;
+}
+
+input.form-control.transSearch{
+	width: 100%;
+}
+
+#formConfirm{
+	text-align: left;
+}
+
+._prt_filt_add_new{
+	float: right;
+	margin: 0 10px;
+}
+
+.greenLabel:hover{
+	color:white;
+}
+
+
+/********* freeDetailWrite*********/
+
+.freeDetailAveterContainer{
+	overflow: hidden;
+	height: 300px;
+}
+
+.freeDetailAvater{
+	float: left;
+	min-width: 150px;
+}
+
+.freeDetailAvater img{
+	width: 100%;
+}
+
+.freeDetailIntroContainer{
+	float:right;
+	width: 75%;
+	height: 100%;
+	
+}
+.freeDetailIntro{
+	display: inline-block;
+	height: 65%;
+}
+
+.freeDetailCareer{
+	height: 30%;
+}
+
+.bold{
+	color: black;
+	font-weight: blod;
+}
+
+.freeDetailLeft, .freeDetailRight{
+	float:left;
+	width: 49%;
+	height: 100%;
+	margin-top: 10px;
+}
+
+#mordalImg{
+	height: 100%;
+	width: 100%;
+}
+
+.freeDetailWritePortfolio{
+	border: none;
+}
+
+
+/*******incSide*******/
+.sideBt{
+	color:white;
+	cursor: pointer;
+}

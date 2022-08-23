@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ez.wonder.pd.model.ProductDAO">
+	<sql id="PdColsRaw">
+		PD_NO
+		, USER_ID
+		, CATE_TYPE
+		, PD_TITLE
+		, REGDATE
+		, DEL_TYPE
+		, READ_COUNT
+		, LANG
+		, FRAME
+	</sql>
+
+	<sql id="DetailColsRaw">
+		DETAIL_NO
+		, PD_NO
+		, PD_TYPE
+		, PD_PRICE
+		, PD_TERM
+		, EDIT_COUNT
+		, SERVICE_EXPLANATION
+		, EDIT_EXPLANATION
+		, COMMERCIAL
+		, CODE_SUPPLY
+		, PAYMENT
+		, CUSTOMIZE
+	</sql>
+
+	<sql id="ImageColsRaw">
+		PDIMG_NO
+		, PD_NO
+		, FILE_NAME
+		, ORIGINAL_FILE_NAME
+		, FILE_SIZE
+		,
+		FILE_TYPE
+	</sql>
+
+
+	<select id="selectAllPd" resultType="productVo">
+		select
+		<include refid="PdColsRaw" />
+		from product
+		order by pd_No desc
+	</select>
+
+	<select id="selectAllPdByUserId" resultType="pdListVo">
+		SELECT
+			T1.PD_NO AS PD_NO
+			, T1.USER_ID AS USER_ID
+			, CATE_TYPE
+			, PD_TITLE
+			, REGDATE
+			, DEL_TYPE
+			, READ_COUNT
+			, LANG
+			, FRAME
+		<choose>
+			<when test="userId != null and userId != ''">
+				, T2.DUP_FLAG AS DUP_FLAG
+			FROM PRODUCT T1 LEFT OUTER JOIN NONE_DUP T2
+				ON T1.PD_NO = T2.PD_NO AND T2.USER_ID = #{userId}
+				order by T1.pd_No desc
+			</when>
+			<otherwise>
+				, NULL AS DUP_FLAG
+			FROM PRODUCT T1
+			order by T1.pd_No desc
+			</otherwise>
+		</choose>
+	</select>
+
+
+	<select id="searchPd" parameterType="string" resultType="pdListVo">
+		SELECT
+			T1.PD_NO AS PD_NO
+			, T1.USER_ID AS USER_ID
+			, CATE_TYPE
+			, PD_TITLE
+			, REGDATE
+			, DEL_TYPE
+			, READ_COUNT
+			, LANG
+			, FRAME
+		<choose>
+			<when test="userId != null and userId != ''">
+				, T2.DUP_FLAG AS DUP_FLAG
+			FROM PRODUCT T1 LEFT OUTER JOIN NONE_DUP T2
+				ON T1.PD_NO = T2.PD_NO AND T2.USER_ID = #{userId}
+			</when>
+			<otherwise>
+				, NULL AS DUP_FLAG
+			FROM PRODUCT T1
+			</otherwise>
+		</choose>
+		<where>
+			<if test="pdTitle != null and pdTitle != ''">
+				AND PD_TITLE LIKE '%' || #{pdTitle} || '%'
+			</if>
+		</where>
+	</select>
+
+	<select id="selectPdDetail" parameterType="int"
+		resultType="PdDetailVO">
+		select
+		<include refid="DetailColsRaw" />
+		from PD_DETAIL
+		<where>
+			AND PD_TYPE = 'STANDARD'
+			<if test="pdNo != 0">
+				AND PD_NO = #{pdNo}
+			</if>
+		</where>
+	</select>
+
+	<select id="selectPdDetailS" parameterType="int"
+		resultType="PdDetailVO">
+		select
+		<include refid="DetailColsRaw" />
+		from PD_DETAIL
+		<where>
+			AND PD_TYPE = 'STANDARD'
+			<if test="pdNo != 0">
+				AND PD_NO = #{pdNo}
+			</if>
+		</where>
+	</select>
+
+	<select id="selectPdImage" parameterType="int"
+		resultType="PdImageVO">
+		select
+		<include refid="ImageColsRaw" />
+		from PD_IMAGE
+		<where>
+			<if test="pdNo != 0">
+				AND PD_NO = #{pdNo}
+			</if>
+		</where>
+	</select>
+
+	<insert id="insertPd" parameterType="productVo">
+		<selectKey resultType="int" keyProperty="pdNo"
+			order="BEFORE">
+			select PRODUCT_seq.nextval from dual
+		</selectKey>
+		INSERT INTO PRODUCT
+		(
+		PD_NO
+		, USER_ID
+		, CATE_TYPE
+		, PD_TITLE
+		, LANG
+		, FRAME
+		)VALUES(
+		#{pdNo}
+		, #{userId}
+		, #{cateType}
+		, #{pdTitle}
+		, #{lang}
+		, #{frame}
+		)
+	</insert>
+
+	<insert id="insertPdDetail" parameterType="PdDetailVO">
+		<selectKey resultType="int" keyProperty="detailNo"
+			order="BEFORE">
+			select PD_DETAIL_seq.nextval from dual
+		</selectKey>
+		INSERT INTO PD_DETAIL
+		(
+		<include refid="DetailColsRaw" />
+		)VALUES(
+		#{detailNo}
+		, #{pdNo}
+		, #{pdType}
+		, #{pdPrice}
+		, #{pdTerm}
+		, #{editCount}
+		, #{serviceExplanation}
+		, #{editExplanation}
+		, #{commercial}
+		, #{codeSupply}
+		, #{payment}
+		, #{customize}
+		)
+	</insert>
+
+	<insert id="insertPdImage" parameterType="PdImageVO">
+		<selectKey resultType="int" keyProperty="pdImgNo"
+			order="BEFORE">
+			select PD_IMAGE_seq.nextval from dual
+		</selectKey>
+		INSERT INTO PD_IMAGE
+		(
+		PDIMG_NO
+		, PD_NO
+		, FILE_NAME
+		, ORIGINAL_FILE_NAME
+		, FILE_SIZE
+		, FILE_TYPE
+		)VALUES(
+		#{pdImgNo}
+		, #{pdNo}
+		, #{fileName}
+		, #{originalFileName}
+		, #{fileSize}
+		, #{fileType}
+		)
+	</insert>
+
+<!-- 
+	<insert id="insertDupFlag" parameterType="NoneDupVO">
+		<selectKey resultType="int" keyProperty="dupNo" order="BEFORE">
+			select NONE_DUP_seq.nextval from dual
+		</selectKey>
+			INSERT INTO NONE_DUP
+			(
+				DUP_NO
+				, PD_NO
+				, USER_ID
+				, DUP_FLAG
+			)VALUES(
+				#{dupNo}
+				, #{pdNo}
+				, #{userId}
+				, #{dupFlag}
+			)
+	</insert>
+	
+	<delete id="deleteDupFlag" parameterType="NoneDupVO">
+		DELETE FROM NONE_DUP
+		<where>
+			<if test="pdNo != 0">
+				AND PD_NO = #{pdNo}
+			</if>
+			<if test="userId != null and userId != ''">
+				AND USER_ID = #{userId}
+			</if>
+		</where>
+	</delete>
+-->
+
+</mapper>

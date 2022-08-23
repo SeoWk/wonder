@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ez.wonder.noneDup.model.NoneDupDAO">
+	<insert id="insertHeartDup" parameterType="noneDupVo">
+		<selectKey keyProperty="dupNo" resultType="int" order="BEFORE">
+			select none_dup_seq.nextval from dual
+		</selectKey>
+		insert into none_dup (dup_no, user_id, pd_no, dup_flag)
+		values(#{dupNo}, #{userId}, #{pdNo}, 'H')
+	</insert>
+	
+	<select id="checkUserId" parameterType="noneDupVo" resultType="int">
+		select count(*) from none_dup where user_id=#{userId} and pd_no=#{pdNo}
+	</select>
+	
+	<delete id="deleteHeartDup" parameterType="noneDupVo">
+		delete from none_dup where user_id=#{userId} and pd_no=#{pdNo}
+	</delete>
+</mapper>

@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ez.wonder.admin.model.AdminDAO">
+	<sql id="searchWhere">
+		<if test="searchKeyword !=null and searchKeyword !=''">
+			where UPPER(${searchCondition})
+			like UPPER('%' ||
+			#{searchKeyword} ||
+			'%')
+		</if>
+	</sql>
+
+	<select id="selectMember" resultType="memberVo"
+		parameterType="searchVo">
+		select *
+		from
+		(
+		select rownum as RNUM, B.*
+		from
+		(
+		select A.*
+		from member A
+		<include refid="searchWhere"></include>
+		order by mem_No desc
+		)B
+		)
+		where RNUM>#{firstRecordIndex} 
+		<![CDATA[
+		and RNUM<=#{firstRecordIndex} + #{recordCountPerPage}]]>
+	</select>
+	
+	<select id="allMember" resultType="memberVo">
+		select * from member
+	</select>
+
+	<delete id="deleteMember" parameterType="String">
+		delete
+		from
+		member
+		where
+		user_Id=#{userId}
+	</delete>
+
+	<select id="selectNonApprovalEx" resultType="memberVo"
+		parameterType="searchVo">
+		select *
+		from
+		(
+		select rownum as RNUM, B.*
+		from
+		(
+		select A.*
+		from
+		(select m.*,
+		e.GRANT_FLAG
+		from member m, expert_grant e
+		where m.user_id = e.user_id)
+		A
+		<include refid="searchWhere"></include>
+		<if test="searchKeyword ==null or searchKeyword ==''"> where
+		</if>
+		<if test="searchKeyword !=null and searchKeyword !=''">
+			and
+		</if>
+		grant_flag = 'N' and type='승인대기'
+		order by mem_No desc
+		)B
+		)
+		where
+		RNUM>#{firstRecordIndex} 
+		<![CDATA[
+		and RNUM<=#{firstRecordIndex} + #{recordCountPerPage}]]>
+	</select>
+
+	<update id="grantExType" parameterType="string">
+		update
+		member
+		set
+		type =
+		'프리랜서'
+		where user_Id = #{userId}
+	</update>
+
+	<update id="grantExFlag" parameterType="string">
+		update
+		expert_grant
+		set
+		grant_flag = 'Y'
+		where user_Id = #{userId}
+	</update>
+
+	<delete id="deleteExType" parameterType="string">
+		update
+		member
+		set
+		type =
+		'일반회원'
+		where
+		user_Id=#{userId}
+	</delete>
+
+	<delete id="deleteExFlag" parameterType="string">
+		delete
+		from
+		expert_grant
+		where
+		user_Id=#{userId}
+	</delete>
+
+	<select id="selectProduct" resultType="productVo"
+		parameterType="searchVo">
+		select *
+		from
+		(
+		select rownum as RNUM, B.*
+		from
+		(
+		select A.*
+		from product A
+		<include refid="searchWhere"></include>
+		order by REGDATE desc
+		)B
+		)
+		where RNUM>#{firstRecordIndex} 
+		<![CDATA[
+		and RNUM<=#{firstRecordIndex} + #{recordCountPerPage}]]>
+	</select>
+
+	<delete id="deleteProduct" parameterType="int">
+		delete
+		from
+		product
+		where
+		pd_No=#{pdNo}
+	</delete>
+
+	<select id="selectAdmin" resultType="adminVo"
+		parameterType="searchVo">
+		select *
+		from
+		(
+		select rownum as RNUM, B.*
+		from
+		(
+		select A.*
+		from admin A
+		<include refid="searchWhere"></include>
+		order by admin_No desc
+		)B
+		)
+		where RNUM>#{firstRecordIndex} 
+		<![CDATA[
+		and RNUM<=#{firstRecordIndex} + #{recordCountPerPage}]]>
+	</select>
+
+	<delete id="deleteSubAdmin" parameterType="int">
+		delete
+		from
+		admin
+		where
+		admin_No=#{adminNo}
+	</delete>
+
+	<select id="selectNonApprovalList" resultType="formVo"
+		parameterType="searchVo">
+		select *
+		from
+		(
+		select rownum as RNUM, B.*
+		from
+		(
+		select A.*
+		from
+		(select
+		p.pd_no,f.user_id,p.cate_type,p.pd_title,p.regdate, p.del_type,
+		p.read_count, p.lang, p.frame, f.form_no,
+		f.form_title, f.form_content,
+		f.form_regdate, f.price, f.pay_flag ,f.orderstart,
+		f.orderend
+		from
+		product p, form f
+		where p.pd_no = f.pd_no) A
+		<include refid="searchWhere"></include>
+		<if test="searchKeyword ==null or searchKeyword ==''"> where
+		</if>
+		<if test="searchKeyword !=null and searchKeyword !=''">
+			and
+		</if>
+		pay_flag='N'
+		order by form_regdate desc
+		)B
+		)
+		where
+		RNUM>#{firstRecordIndex}
+		<![CDATA[
+		and RNUM<=#{firstRecordIndex} + #{recordCountPerPage}]]>
+	</select>
+
+	<delete id="deleteForm" parameterType="int">
+		delete
+		from
+		form
+		where
+		form_no=#{formNo}
+	</delete>
+
+	<select id="getMemTotalRecord" parameterType="searchVo"
+		resultType="int">
+		select count(*) from member
+		<include refid="searchWhere"></include>
+	</select>
+
+	<select id="getExMemTotalRecord" parameterType="searchVo"
+		resultType="int">
+		select count(*) from member
+		<include refid="searchWhere"></include>
+		<if test="searchKeyword ==null or searchKeyword ==''"> where
+		</if>
+		<if test="searchKeyword !=null and searchKeyword !=''">
+			and
+		</if>
+		type='승인대기'
+	</select>
+
+	<select id="getPdTotalRecord" parameterType="searchVo"
+		resultType="int">
+		select count(*) from product
+		<include refid="searchWhere"></include>
+	</select>
+
+	<select id="getAdTotalRecord" parameterType="searchVo"
+		resultType="int">
+		select count(*) from admin
+		<include refid="searchWhere"></include>
+	</select>
+
+	<select id="getFormTotalRecord" parameterType="searchVo"
+		resultType="int">
+		select count(*) from form
+		<include refid="searchWhere"></include>
+		<if test="searchKeyword ==null or searchKeyword ==''"> where
+		</if>
+		<if test="searchKeyword !=null and searchKeyword !=''">
+			and
+		</if>
+		pay_flag='N'
+	</select>
+
+	<select id="selectByAdminId" parameterType="string"
+		resultType="adminVo">
+		select * from admin
+		where admin_Id=#{adminId}
+	</select>
+
+	<select id="selectPwd" parameterType="string"
+		resultType="string">
+		select admin_Pwd from admin
+		where admin_Id=#{adminId}
+	</select>
+
+	<update id="updateAdmin" parameterType="adminVo">
+		update admin set
+		admin_Pwd=#{adminPwd} where admin_Id=#{adminId}
+	</update>
+
+	<insert id="insertAdmin" parameterType="adminVo">
+		<selectKey keyProperty="adminNo" resultType="int"
+			order="BEFORE">
+			select
+			ADMIN_SEQ.nextval from dual
+		</selectKey>
+		insert into admin(admin_no, admin_id, admin_pwd)
+		values(#{adminNo},
+		#{adminId}, #{adminPwd})
+	</insert>
+
+	<select id="dupAdminId" parameterType="String" resultType="int">
+		select count(*) from admin
+		where admin_Id=#{adminId}
+	</select>
+
+	<select id="excelMember" resultType="memberVo">
+		select *
+		from member
+		order by
+		mem_No desc
+	</select>
+</mapper>

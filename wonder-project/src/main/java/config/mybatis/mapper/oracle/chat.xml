@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ez.wonder.chatting.model.ChatDAO">
+
+<!-- 테스트용 채팅방 생성 -->
+<!-- <insert id="insertTestChat" parameterType="chatVo">
+	<selectKey resultType="int" keyProperty="chatNo" order="BEFORE">
+		select CHAT_SEQ.nextval from dual
+	</selectKey>
+	insert into chat
+	values (#{chatNo},#{userId},#{chatNo},'거래채팅',sysdate)
+</insert> -->
+
+<!-- 테스트용 채팅방 존재여부 확인 -->
+<select id="checkChat" parameterType="String" resultType="int">
+	select count(*) from chat
+	where r_user_id=#{userId}
+</select>
+
+
+
+<!-- 채팅방 가장 최근 내용 vo -->
+<!-- <select id="selectChatById" parameterType="hashMap" resultType="chatCommentVo">
+	select A.*, rownum
+	from
+	(
+	select a.chat_no, b.content_no, b.s_user_id,b.s_user_nick, b.r_user_id,b.r_user_nick, b.content, b.timestamp
+	from chat a left join chat_content b
+	on a.chat_no=b.chat_no
+	where s_user_id=#{sUserId} and r_user_id=#{rUserId}
+	order by timestamp desc
+	)A
+	where rownum=1
+</select> -->
+
+<!-- 내가 채팅중인 채팅방 select -->
+<select id="selectMyChat" parameterType="string" resultType="hashmap">
+select C.CHAT_NO, C.S_USER_ID, C.R_USER_ID, TO_CHAR(C.CONTENT) AS CONTENT, C.CHATROOM_STATUS, C.CHECK_STATUS, C.TIMESTAMP,
+    (select nickname from member A where A.user_id = C.s_user_id) s_nickname, 
+    (select nickname from member B where B.user_id = C.r_user_id) r_nickname,
+    (select file_name from expert_image E where E.user_id = C.r_user_id and E.file_type='PROFILE') fileName
+from chat C
+where (s_user_id, r_user_id,timestamp) 
+in
+(
+select A.* from 
+(
+	select s_user_id, r_user_id, max(timestamp) 
+    from chat 
+    where s_user_id=#{userId}
+    group by s_user_id, r_user_id
+)  A full outer join (
+     select s_user_id, r_user_id, max(timestamp) 
+    from chat 
+    where r_user_id=#{userId}
+    group by s_user_id, r_user_id) B
+    on A.s_user_id = B.r_user_id
+)
+</select>
+<!-- 상대방 id로 채팅방 찾기 -->
+<select id="selectChatById" parameterType="hashmap" resultType="hashmap">
+	select C.CHAT_NO, C.S_USER_ID, C.R_USER_ID, TO_CHAR(C.CONTENT) AS CONTENT, C.CHATROOM_STATUS, C.CHECK_STATUS, to_char(C.TIMESTAMP) as TIMESTAMP,
+	    (select nickname from member A where A.user_id = C.s_user_id) s_nickname, 
+	    (select nickname from member B where B.user_id = C.r_user_id) r_nickname,
+	    (select file_name from expert_image E where E.user_id = C.r_user_id and E.file_type='PROFILE') fileName
+	from chat C
+	where (s_user_id=#{sUserId} or r_user_id=#{sUserId})
+	and (s_user_id=#{rUserId} or r_user_id=#{rUserId})
+	order by timestamp
+</select>
+
+<!-- 상대방 id로 닉네임 찾기 -->
+<select id="selectNickById" parameterType="string" resultType="string">
+	select nickname from member
+	where user_id=#{userId}
+</select>
+
+
+<!-- 채팅 메세지 보내기 (insert) -->
+<insert id="insertChat" parameterType="chatVo">
+	<selectKey resultType="int" keyProperty="chatNo" order="BEFORE">
+		select chat_seq.nextval from dual
+	</selectKey>
+	insert into chat
+	values (#{chatNo}, #{sUserId},#{rUserId},#{content},'O','N',systimestamp)
+</insert>
+
+
+<!-- 거래성사시 기본 채팅메세지 보내기 -->
+<insert id="insertDefaultChat" parameterType="chatVo">
+	<selectKey resultType="int" keyProperty="chatNo" order="BEFORE">
+		select chat_seq.nextval from dual
+	</selectKey>
+	insert into chat
+	values (#{chatNo}, #{sUserId},#{rUserId},'상대방과의 대화를 시작합니다','O','N',systimestamp)
+</insert>
+
+<!-- 거래취소시 취소 채팅메세지 보내기 -->
+<insert id="insertCancleChat" parameterType="chatVo">
+	<selectKey resultType="int" keyProperty="chatNo" order="BEFORE">
+		select chat_seq.nextval from dual
+	</selectKey>
+	insert into chat
+	values (#{chatNo}, #{sUserId},#{rUserId},'상대방과의 거래가 취소되었습니다','O','N',systimestamp)
+</insert>
+
+
+
+</mapper>
